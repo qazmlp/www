@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+</html>
+<title>Furry/Art Holiday Calendar</title>
+
+<template id="calendarEntry">
+	<details>
+		<summary>
+			<b data-id="date">DATE</b> <span data-id="summary">SUMMARY</span></summary>
+		<p data-id="location-p"><img src="/silk/map.png" alt="location"> <span data-id="location">LOCATION</span>
+		<p data-id="description" style="white-space: pre-wrap;">
+	</details>
+</template>
+
+<h1>Furry/Art Holiday Calendar</h1>
+
+<p>This is a work in progress, both in form and content.</p>
+
+<p>
+	You can get a better-functioning live calendar by subscribing directly:<br>
+	<a href="https://ics.qazm.de/furry-art-holidays-SFW.ics"><img src="/silk/calendar.png" alt="calendar">SFW</a>
+	<a href="https://ics.qazm.de/furry-art-holidays-NSFW.ics"><img src="/silk/calendar.png" alt="calendar">NSFW</a>
+	(refreshed hourly)
+
+<section id="upcoming"></section>
+
+<p>TODO:
+
+<ul>
+	<li>Handle repeating events.</li>
+	<li>Better visual design.</li>
+	<li>Properly handle extended holidays.</li>
+</ul>
+</p>
+
+<p>Icons: <a rel="UGC" href="http://www.famfamfam.com/lab/icons/silk/">famfamfam Silk</a> used under <a href="http://creativecommons.org/licenses/by/2.5/">CC-BY-2.5</a>.</p>
+
+<script src="./calendar.mjs" type="module" defer></script>
