@@ -59,6 +59,7 @@ events.sort((a, b) => {
 console.log(events);
 
 const upcoming = document.getElementById('upcoming');
+upcoming.innerText = '';
 for (const event of events) {
 	const el = cloneFirstElementChildOf('calendarEntry');
 
