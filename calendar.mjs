@@ -39,8 +39,8 @@ for (const [color, url] of calendars) {
 					break;
 			}
 
-			// Handle New Year's Even events.
-			if (month == 12 && day == 31 && endMonth == 1 && endDay == 1) {
+			// Handle New Year's Eve events.
+			if (endMonth < month || endMonth == month && endDay < day) {
 				endYear = (endYear + 1).toString();
 			}
 		}
