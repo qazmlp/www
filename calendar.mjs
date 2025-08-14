@@ -20,6 +20,7 @@ for (const [color, url] of calendars) {
 		const [endYear, endMonth, endDay] = /^DTEND;VALUE=DATE:(\d{4})(\d{2})(\d{2})$/m.exec(icsEvent).slice(1);
 		const [location] = (/^LOCATION:(.*)$/m.exec(icsEvent) || []).slice(1);
 		const [description] = (/^DESCRIPTION:(.*(?:\r\n .*)*)/m.exec(icsEvent) || []).slice(1);
+		const isYearlyMonthDay = icsEvent.includes('YEARLY') && icsEvent.includes('BYMONTH') && icsEvent.includes('BYMONTHDAY');
 		console.log(year, month, day, summary);
 		console.log(location);
 		console.log(description);
@@ -29,6 +30,7 @@ for (const [color, url] of calendars) {
 			year, month, day,
 			summary,
 			endYear, endMonth, endDay,
+			isYearlyMonthDay,
 			location, description,
 		});
 	}
@@ -64,7 +66,11 @@ for (const event of events) {
 	const el = cloneFirstElementChildOf('calendarEntry');
 
 	el.style.background = event.color;
-	el.querySelector('[data-id="date"]').textContent = event.year == new Date().getFullYear() ? `${event.month} ${event.day}` : `${event.year} ${event.month} ${event.day}`;
+	if (event.isYearlyMonthDay) {
+		el.querySelector('[data-id="date"]').textContent = `     ${event.month} ${event.day}`;
+	} else {
+		el.querySelector('[data-id="date"]').textContent = `${event.year} ${event.month} ${event.day}`;
+	}
 	el.querySelector('[data-id="summary"]').textContent = event.summary;
 
 	if (event.location) {
