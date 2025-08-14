@@ -14,16 +14,36 @@ for (const [color, url] of calendars) {
 	const response = await fetch(url);
 	const ics = await response.text();
 	for (const icsEvent of ics.match(/^BEGIN:VEVENT$(.*?)^END:VEVENT$/mgs)) {
-		console.log(JSON.stringify(icsEvent));
 		const [summary] = /^SUMMARY:(.*)$/m.exec(icsEvent).slice(1);
-		const [year, month, day] = /^DTSTART;VALUE=DATE:(\d{4})(\d{2})(\d{2})$/m.exec(icsEvent).slice(1);
-		const [endYear, endMonth, endDay] = /^DTEND;VALUE=DATE:(\d{4})(\d{2})(\d{2})$/m.exec(icsEvent).slice(1);
+		let [year, month, day] = /^DTSTART;VALUE=DATE:(\d{4})(\d{2})(\d{2})$/m.exec(icsEvent).slice(1);
+		let [endYear, endMonth, endDay] = /^DTEND;VALUE=DATE:(\d{4})(\d{2})(\d{2})$/m.exec(icsEvent).slice(1);
 		const [location] = (/^LOCATION:(.*)$/m.exec(icsEvent) || []).slice(1);
 		const [description] = (/^DESCRIPTION:(.*(?:\r\n .*)*)/m.exec(icsEvent) || []).slice(1);
+
 		const isYearlyMonthDay = icsEvent.includes('YEARLY') && icsEvent.includes('BYMONTH') && icsEvent.includes('BYMONTHDAY');
-		console.log(year, month, day, summary);
-		console.log(location);
-		console.log(description);
+		if (isYearlyMonthDay) {
+			const now = new Date();
+			switch (true) {
+				// Annoying mix of 0- and 1-indexing.
+				case +year > now.getFullYear():
+				case +year == now.getFullYear() && +month > now.getMonth() + 1:
+				case +year == now.getFullYear() && +month == now.getMonth() + 1 && +day >= now.getDate():
+				case +endYear > now.getFullYear():
+				case +endYear == now.getFullYear() && +endMonth > now.getMonth() + 1:
+				case +endYear == now.getFullYear() && +endMonth == now.getMonth() + 1 && +endDay > now.getDate():
+					endYear = year = now.getFullYear().toString();
+					break;
+
+				default:
+					endYear = year = (now.getFullYear() + 1).toString();
+					break;
+			}
+
+			// Handle New Year's Even events.
+			if (month == 12 && day == 31 && endMonth == 1 && endDay == 1) {
+				endYear = (endYear + 1).toString();
+			}
+		}
 
 		events.push({
 			color,
@@ -58,10 +78,11 @@ events.sort((a, b) => {
 		default: return 0;
 	}
 });
-console.log(events);
 
-const upcoming = document.getElementById('upcoming');
-upcoming.innerText = '';
+const currentAndUpcoming = document.getElementById('currentAndUpcoming');
+currentAndUpcoming.innerText = '';
+const past = document.getElementById('past');
+past.innerText = '';
 for (const event of events) {
 	const el = cloneFirstElementChildOf('calendarEntry');
 
@@ -92,6 +113,27 @@ for (const event of events) {
 		el.querySelector('[data-id="description"]').remove();
 	}
 
+	const now = new Date();
+	switch (true) {
+		case event.isYearlyMonthDay:
+		// Annoying mix of 0- and 1-indexing.
+		case +event.year > now.getFullYear():
+		case +event.year == now.getFullYear() && +event.month > now.getMonth() + 1:
+		case +event.year == now.getFullYear() && +event.month == now.getMonth() + 1 && +event.day >= now.getDate():
+		case +event.endYear > now.getFullYear():
+		case +event.endYear == now.getFullYear() && +event.endMonth > now.getMonth() + 1:
+		case +event.endYear == now.getFullYear() && +event.endMonth == now.getMonth() + 1 && +event.endDay > now.getDate():
+			currentAndUpcoming.appendChild(el);
+			break;
 
-	upcoming.appendChild(el);
+		default:
+			past.appendChild(el);
+			break;
+	}
 }
+
+for (const child of Array.from(past.children).reverse()) {
+	past.appendChild(child);
+}
+
+console.log("Schedule OK")
