@@ -20,6 +20,7 @@ for (const [color, url] of calendars) {
 		const [location] = (/^LOCATION:(.*)$/m.exec(icsEvent) || []).slice(1);
 		const [description] = (/^DESCRIPTION:(.*(?:\r\n .*)*)/m.exec(icsEvent) || []).slice(1);
 
+		const isRepeating = icsEvent.includes('RRULE');
 		const isYearlyMonthDay = icsEvent.includes('YEARLY') && icsEvent.includes('BYMONTH') && icsEvent.includes('BYMONTHDAY');
 		if (isYearlyMonthDay) {
 			const now = new Date();
@@ -50,7 +51,7 @@ for (const [color, url] of calendars) {
 			year, month, day,
 			summary,
 			endYear, endMonth, endDay,
-			isYearlyMonthDay,
+			isRepeating, isYearlyMonthDay,
 			location, description,
 		});
 	}
@@ -92,7 +93,6 @@ for (const event of events) {
 	} else {
 		el.querySelector('[data-id="date"]').textContent = `${event.year} ${event.month} ${event.day}`;
 	}
-	el.querySelector('[data-id="summary"]').textContent = event.summary;
 
 	if (event.location) {
 		el.querySelector('[data-id="location"]').textContent = event.location;
@@ -128,8 +128,12 @@ for (const event of events) {
 
 		default:
 			past.appendChild(el);
+			if (event.isRepeating) {
+				event.summary += " ‼️TODO: Variable repeat.";
+			}
 			break;
 	}
+	el.querySelector('[data-id="summary"]').textContent = event.summary;
 }
 
 for (const child of Array.from(past.children).reverse()) {
