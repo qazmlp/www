@@ -26,12 +26,10 @@ for (const [color, url] of calendars) {
 			const now = new Date();
 			switch (true) {
 				// Annoying mix of 0- and 1-indexing.
-				case +year > now.getFullYear():
-				case +year == now.getFullYear() && +month > now.getMonth() + 1:
-				case +year == now.getFullYear() && +month == now.getMonth() + 1 && +day >= now.getDate():
-				case +endYear > now.getFullYear():
-				case +endYear == now.getFullYear() && +endMonth > now.getMonth() + 1:
-				case +endYear == now.getFullYear() && +endMonth == now.getMonth() + 1 && +endDay > now.getDate():
+				case +month > now.getMonth() + 1:
+				case +month == now.getMonth() + 1 && +day >= now.getDate():
+				case +endMonth > now.getMonth() + 1:
+				case +endMonth == now.getMonth() + 1 && +endDay > now.getDate():
 					endYear = year = now.getFullYear().toString();
 					break;
 
@@ -113,6 +111,7 @@ for (const event of events) {
 		el.querySelector('[data-id="description"]').remove();
 	}
 
+	// This doesn't check if the repeats ended in the past!
 	const now = new Date();
 	switch (true) {
 		case event.isYearlyMonthDay:
